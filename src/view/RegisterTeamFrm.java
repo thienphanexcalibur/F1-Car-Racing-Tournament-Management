@@ -1,0 +1,383 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package view;
+
+import controller.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.ListModel;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.basic.BasicListUI;
+import model.Racer;
+import model.Register;
+import model.Stage;
+import model.Team;
+import model.Tournament;
+
+/**
+ *
+ * @author justj
+ */
+public class RegisterTeamFrm extends javax.swing.JFrame {
+
+    Tournament tournament;
+    DefaultListModel ls;
+    DefaultListModel lt;
+    DefaultListModel lr;
+    JList listS;
+    JList listT;
+    JList listR;
+
+    /**
+     * Creates new form AddTeamFrm
+     */
+    public RegisterTeamFrm(Tournament tournament) throws SQLException {
+        this.tournament = tournament;
+        initComponents();
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        ls = new DefaultListModel<>();
+        lt = new DefaultListModel<>();
+        lr = new DefaultListModel<>();
+        listS = this.stagesList;
+        listT = this.teamsList;
+        listR = this.racersList;
+        listR.setModel(lr);
+        listT.setModel(lt);
+        listR.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        listR.setSelectionInterval(1, 2);
+        listenEvents();
+    }
+
+    public void getTeamsList(Stage stage, DefaultListModel lt) throws SQLException {
+        ArrayList<Team> teams = new RegisterDAO().getUnregisteredTeam(stage, tournament);
+        System.out.println(teams.size());
+        if (teams.size() > 0) {
+            teams.forEach((t) -> {
+                lt.addElement(t);
+            });
+            this.teamsList.setModel(lt);
+        }
+    }
+
+    public void getRacersList(Team team, DefaultListModel lr) throws SQLException {
+        System.out.println(team);
+        ArrayList<Racer> racers = new RegisterDAO().getRacers(team);
+        if (racers.size() > 0) {
+            racers.forEach(r -> {
+                lr.addElement(r);
+            });
+            this.racersList.setModel(lr);
+        }
+    }
+
+    public void getStagesList(ArrayList<Stage> stages, DefaultListModel ls) {
+        if (stages.size() > 0) {
+
+            stages.forEach((s) -> {
+                ls.addElement(s);
+            });
+            this.stagesList.setModel(ls);
+        }
+    }
+
+    public void listenEvents() throws SQLException {
+
+        ArrayList<Stage> stages = new RegisterDAO().getStages();
+        getStagesList(stages, ls);
+
+        this.stagesList.addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    lt.removeAllElements();
+                    Stage stage = (Stage) ls.getElementAt(listS.getSelectedIndex());
+                    try {
+                        getTeamsList(stage, lt);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(RegisterTeamFrm.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
+
+        this.teamsList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                lr.removeAllElements();
+
+                if (!e.getValueIsAdjusting() && listT.getSelectedIndex() >= 0) {
+                    Team team = (Team) lt.getElementAt(listT.getSelectedIndex());
+                    try {
+                        getRacersList(team, lr);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(RegisterTeamFrm.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
+
+//        this.racersList.addListSelectionListener(new ListSelectionListener() {
+//            @Override
+//            public void valueChanged(ListSelectionEvent e) {
+//                if (!e.getValueIsAdjusting() && listR.getSelectedIndex() > 0) {
+//                    int index = listR.getSelectedIndex();
+//                    int[] indices = {index, e.getLastIndex()};
+//                    listR.setSelectedIndices(indices);
+//                }
+//            }
+//        });
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
+
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        teamsList = new javax.swing.JList<>();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        racersList = new javax.swing.JList<>();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        stagesList = new javax.swing.JList<>();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        confirmBtn = new javax.swing.JButton();
+        resetBtn = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Team Register");
+
+        teamsList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane1.setViewportView(teamsList);
+
+        racersList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane2.setViewportView(racersList);
+
+        stagesList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, stagesList, org.jdesktop.beansbinding.ELProperty.create("${selectedElement}"), stagesList, org.jdesktop.beansbinding.BeanProperty.create("selectedElement"));
+        bindingGroup.addBinding(binding);
+
+        jScrollPane3.setViewportView(stagesList);
+
+        jLabel1.setText("Teams:");
+
+        jLabel2.setText("Racers");
+
+        jLabel3.setText("Stages:");
+
+        confirmBtn.setText("Confirm");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, confirmBtn, org.jdesktop.beansbinding.ELProperty.create("${selected}"), confirmBtn, org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        bindingGroup.addBinding(binding);
+
+        confirmBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                confirmBtnActionPerformed(evt);
+            }
+        });
+
+        resetBtn.setText("Reset");
+        resetBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetBtnActionPerformed(evt);
+            }
+        });
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel4.setText("Register Team");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(201, 201, 201)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3))
+                        .addGap(41, 41, 41)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(61, 61, 61)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(confirmBtn)
+                                .addGap(32, 32, 32)
+                                .addComponent(resetBtn))
+                            .addComponent(jLabel2)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(359, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(jLabel4)
+                .addGap(86, 86, 86)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane3)
+                    .addComponent(jScrollPane1)
+                    .addComponent(jScrollPane2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 107, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(confirmBtn)
+                    .addComponent(resetBtn))
+                .addGap(43, 43, 43))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        bindingGroup.bind();
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void resetBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_resetBtnActionPerformed
+
+    private void confirmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmBtnActionPerformed
+        // TODO add your handling code here:
+
+        if (listR.getSelectedIndices().length == 2 && lr.getSize() > 0 && listT.getSelectedIndex() >= 0 && listS.getSelectedIndex() >= 0) {
+            ArrayList<Racer> racers = new ArrayList<>();
+            Team team = (Team) lt.getElementAt(listT.getSelectedIndex());
+            Stage stage = (Stage) ls.getElementAt(listS.getSelectedIndex());
+            for (int i = 0; i <= listR.getSelectedIndices().length - 1; i++) {
+                Racer racer = (Racer) lr.getElementAt(listR.getSelectedIndices()[i]);
+                racers.add(racer);
+                System.out.println(racer);
+            }
+            try {
+                ArrayList<Register> registers = new RegisterDAO().createRegister(team, racers);
+                new RegisterDAO().registerStage(stage, registers);
+            } catch (SQLException ex) {
+                Logger.getLogger(RegisterTeamFrm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                lt.removeAllElements();
+                getTeamsList(stage, lt);
+            } catch (SQLException ex) {
+                Logger.getLogger(RegisterTeamFrm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            JOptionPane.showMessageDialog(this, "Success!");
+        } else {
+            JOptionPane.showMessageDialog(this, "You have to select 2 racers, a team and a stage!");
+        }
+    }//GEN-LAST:event_confirmBtnActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(RegisterTeamFrm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(RegisterTeamFrm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(RegisterTeamFrm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(RegisterTeamFrm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    new RegisterTeamFrm(null).setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(RegisterTeamFrm.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton confirmBtn;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JList<String> racersList;
+    private javax.swing.JButton resetBtn;
+    private javax.swing.JList<String> stagesList;
+    private javax.swing.JList<String> teamsList;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
+    // End of variables declaration//GEN-END:variables
+}
